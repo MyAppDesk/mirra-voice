@@ -20,8 +20,11 @@ rm -rf dict lexicon-zh.txt ./*-zh.fst
 find espeak-ng-data -name '*_dict' ! -name 'en_dict' ! -name 'es_dict' -delete
 
 echo "→ gzip repackaging…"
+# --format=ustar (no PAX headers) + COPYFILE_DISABLE (no AppleDouble ._* junk):
+# the pure-Dart `archive` package (app-side) throws on PAX extended headers that
+# macOS bsdtar emits by default. ustar decodes cleanly.
 cd "$WORK"
-tar czf pack.tar.gz "$DIR"
+COPYFILE_DISABLE=1 tar --format=ustar -czf pack.tar.gz "$DIR"
 
 OUT="$(pwd -P)"; cd - >/dev/null
 mv "$WORK/pack.tar.gz" "./$DIR.tar.gz"
