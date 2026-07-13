@@ -1,0 +1,4 @@
+# scratch
+*.tar.bz2
+kokoro-int8-multi-lang-v1_0/
+pack.tar.*
