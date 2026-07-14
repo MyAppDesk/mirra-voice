@@ -15,9 +15,15 @@ echo "→ extracting…"
 tar xjf "$WORK/pack.tar.bz2" -C "$WORK"
 cd "$WORK/$DIR"
 
-echo "→ trimming non-en/es assets…"
-rm -rf dict lexicon-zh.txt ./*-zh.fst
-find espeak-ng-data -name '*_dict' ! -name 'en_dict' ! -name 'es_dict' -delete
+echo "→ trimming to Kokoro-supported languages…"
+# Keep the espeak phoneme dict for every Kokoro voice language: en/es/fr/it/pt/hi/ja
+# (Japanese phonemizes through espeak's ja_dict). Chinese (zh) uses the jieba dict/,
+# lexicon-zh.txt and the *-zh.fst text normalizers instead of espeak, so those stay.
+# Every other language's *_dict is dropped (ru_dict alone is 8.1 MB).
+KEEP='en_dict es_dict fr_dict it_dict pt_dict hi_dict ja_dict'
+for f in espeak-ng-data/*_dict; do
+  case " $KEEP " in *" $(basename "$f") "*) ;; *) rm -f "$f";; esac
+done
 
 echo "→ gzip repackaging…"
 # --format=ustar (no PAX headers) + COPYFILE_DISABLE (no AppleDouble ._* junk):

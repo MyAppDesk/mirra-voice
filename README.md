@@ -11,7 +11,7 @@ for faster download and much faster on-device extraction.
 | | Upstream | This pack |
 |---|---|---|
 | File | `kokoro-int8-multi-lang-v1_0.tar.bz2` | `kokoro-int8-multi-lang-v1_0.tar.gz` |
-| Size | 125.7 MB | **112.6 MB** |
+| Size | 125.7 MB | **118.4 MB** |
 | Compression | bzip2 | gzip |
 | Extraction on device | slow (pure-Dart bzip2 decode) | **fast** (pure-Dart gzip decode) |
 
@@ -26,19 +26,18 @@ shasum -a 256 -c SHA256SUMS
 
 ## What was trimmed
 
-The Mirra app only speaks **English** and **Spanish**. Everything specific to other
-languages was removed — the model weights, all speaker embeddings, and English/Spanish
-phonemization are untouched:
+The app ships every language Kokoro-82M can actually speak: **English, Spanish,
+French, Italian, Portuguese (BR), Hindi, Japanese and Mandarin Chinese**. Only the
+phoneme data for languages with no Kokoro voice was removed:
 
-- `dict/` — Chinese (jieba) word-segmentation dictionaries (~14 MB)
-- `lexicon-zh.txt` — Chinese lexicon (~2.3 MB)
-- `*-zh.fst` — Chinese text-normalization FSTs
-- `espeak-ng-data/*_dict` — compiled phoneme dicts for every language **except**
-  `en_dict` and `es_dict` (~17 MB, e.g. `ru_dict` alone was 8.5 MB)
+- `espeak-ng-data/*_dict` — compiled phoneme dicts for every language **except** the
+  ones with a Kokoro voice: `en_dict`, `es_dict`, `fr_dict`, `it_dict`, `pt_dict`,
+  `hi_dict`, `ja_dict` (Japanese phonemizes through espeak). `ru_dict` alone was 8.1 MB.
 
-Kept whole: `model.int8.onnx` (114 MB, the hard floor), `voices.bin` (all speakers —
-Mirra selects by speaker id, so the binary is left intact), both English lexicons,
-`tokens.txt`, and the shared espeak-ng core.
+Kept whole: `model.int8.onnx` (109 MB, the hard floor), `voices.bin` (all 54 speakers —
+the app selects by speaker id, so the binary is left intact), both English lexicons,
+the Chinese pipeline (`dict/` jieba segmentation, `lexicon-zh.txt`, `*-zh.fst`
+normalizers), `tokens.txt`, and the shared espeak-ng core.
 
 ## Reproducing
 
